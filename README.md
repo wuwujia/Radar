@@ -1,7 +1,5 @@
 # PUBG-Radar ![Imgur](https://i.imgur.com/n3JtN5d.png)
 
-
-
 ### Updated for Newest Patch
 
 #Beware this is a ROUGH update, it is RIDDLED with bugs, but it semi works.
