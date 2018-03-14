@@ -2,7 +2,12 @@
 
 
 
-Updated for Newest Patch join us on [Discord for updates](https://discord.gg/pAuVxYB)
+# Updated for Newest Patch
+
+#join us on [Discord for updates](https://discord.gg/pAuVxYB)
+
+
+'Reverted' Back to an older Commit Due to CharMoveComp No longer being used.
 
 
 #### By engaging with this repository you explicitly agree with the terms of the Unlicense.
@@ -10,9 +15,6 @@ Updated for Newest Patch join us on [Discord for updates](https://discord.gg/pAu
 
 ![Imgur](https://i.imgur.com/Pc7foHp.gif)
 
-This version runs without the spoofing shit in a VM.
-
-'Fixed' the item locations, still working on it.
 
 ### Key Kinds
 You can't filter level 3 gear (always enabled)
@@ -28,9 +30,6 @@ NUMPAD_5 -> Filter Level 2 Gear
 NUMPAD_6 -> Filter Meds
 
 
-
-
-
 #### Item Offset Tweaker Keybinds
 * F5 -> Item Offset X++
 * F6 -> Item Offset X--
@@ -44,6 +43,7 @@ NUMPAD_6 -> Filter Meds
 * F9 ->  Camera Zoom ++
 * F10 -> Camera Zoom --
 * F11 -> Toggle View Line
+
 
 
 ### Online Mode:
