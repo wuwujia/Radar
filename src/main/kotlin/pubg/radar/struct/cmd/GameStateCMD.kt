@@ -109,13 +109,14 @@ object GameStateCMD : GameListener {
                     val bTimerPaused = propertyBool()
                     val b = bTimerPaused
                 }
-                30 -> {
-                    NumJoinPlayers = propertyInt()
-                }
+             //   30 -> {
+              //      NumJoinPlayers = propertyInt() // old
+              //  }
                 31 -> {
                     NumAlivePlayers = propertyInt()
                 }
                 32 -> {
+                    NumJoinPlayers = propertyInt()
                     val NumAliveZombiePlayers = propertyInt()
                     val b = NumAliveZombiePlayers
                 }
