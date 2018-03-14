@@ -2,7 +2,9 @@
 
 
 
-# Updated for Newest Patch
+### Updated for Newest Patch
+
+#Beware this is a ROUGH update, it is RIDDLED with bugs, but it semi works.
 
 #join us on [Discord for updates](https://discord.gg/pAuVxYB)
 
