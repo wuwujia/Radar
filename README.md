@@ -4,11 +4,12 @@
 
 # Updated for Newest Patch
 
-#join us on [Discord for updates](https://discord.gg/pAuVxYB)
+join us on [Discord for updates](https://discord.gg/pAuVxYB)
 
 
 'Reverted' Back to an older Commit Due to CharMoveComp No longer being used.
 
+SDK Dumped by (legitnutty33)
 
 #### By engaging with this repository you explicitly agree with the terms of the Unlicense.
 
