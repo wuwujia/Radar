@@ -220,6 +220,8 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     private var toggleVNames = 1
     private var drawgrid = -1
     private var nameToggles = 1
+    private var ZoomToggles = 0
+    private var VehicleInfoToggles = 1
 
     private fun windowToMap(x: Float, y: Float) =
             Vector2(selfCoords.x + (x - windowWidth / 2.0f) * camera.zoom * windowToMapUnit + screenOffsetX,
@@ -292,8 +294,16 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
             F4 -> toggleView = toggleView * -1
 
         // Toggle Vehicles
-            F5 -> toggleVehicles = toggleVehicles * -1
-            F6 -> toggleVNames = toggleVNames * -1
+          //  F5 -> toggleVehicles = toggleVehicles * -1
+          //  F6 -> toggleVNames = toggleVNames * -1
+
+            F5 -> {if (VehicleInfoToggles <= 4)
+            {VehicleInfoToggles += 1}
+                if (VehicleInfoToggles == 4)
+                {VehicleInfoToggles = 1}
+            }
+
+
 
         // Toggle Menu
             F12 -> drawmenu = drawmenu * -1
@@ -308,9 +318,11 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
             NUMPAD_0 -> filterAmmo = filterAmmo * -1
 
         // Zoom (Loot, Combat, Scout)
-            NUMPAD_7 -> camera.zoom = 1 / 8f
-            NUMPAD_8 -> camera.zoom = 1 / 12f
-            NUMPAD_9 -> camera.zoom = 1 / 24f
+            NUMPAD_8 -> {if (ZoomToggles <= 4)
+                            {ZoomToggles += 1}
+                         if (ZoomToggles == 4)
+                            {ZoomToggles = 1}
+                        }
 
         // Zoom In/Out || Overrides Max/Min Zoom
             PLUS -> camera.zoom = camera.zoom + 0.00525f
@@ -320,7 +332,8 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         return false
     }
 
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+
+        override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (!dragging) return false
         with(camera) {
             screenOffsetX += (prevScreenX - screenX.toFloat()) * camera.zoom * 500
@@ -525,6 +538,12 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                             false, true)
                 }
             }
+
+            when (ZoomToggles) {
+                1 -> camera.zoom = 1 / 8f
+                2 -> camera.zoom = 1 / 12f
+                3 -> camera.zoom = 1 / 24f
+            }
         }
 
         shapeRenderer.projectionMatrix = camera.combined
@@ -579,7 +598,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
             if (filterWeapon != 1)
                 espFont.draw(spriteBatch, "WEAPON", 40f, windowHeight - 25f)
             else
-                espFontShadow.draw(spriteBatch, "WEAPON", 39f, windowHeight - 25f)
+                espFontShadow.draw(spriteBatch, "WEAPON", 40f, windowHeight - 25f)
 
             if (filterAttach != 1)
                 espFont.draw(spriteBatch, "ATTACH", 40f, windowHeight - 42f)
@@ -626,6 +645,13 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
 
             val num = nameToggles
             espFontShadow.draw(spriteBatch, "[F8] Player Info: $num", 270f, windowHeight - 42f)
+
+            val znum = ZoomToggles
+            espFontShadow.draw(spriteBatch, "[Num8] Zoom Toggle: $znum", 40f, windowHeight - 68f)
+
+            val vnum = VehicleInfoToggles
+            espFontShadow.draw(spriteBatch, "[F5] Vehicle Toggles: $vnum", 40f, windowHeight - 85f)
+
 
 
 
@@ -1013,6 +1039,13 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     private fun drawPawns(typeLocation: EnumMap<Archetype, MutableList<renderInfo>>) {
         val iconScale = 2f / camera.zoom
         for ((type, actorInfos) in typeLocation) {
+
+            when (VehicleInfoToggles) {
+                1 -> toggleVehicles = 1
+                2 -> toggleVNames = 1
+                3 -> toggleVehicles and toggleVNames == 1
+
+            }
 
             when (type) {
                 TwoSeatBoat -> actorInfos?.forEach {
