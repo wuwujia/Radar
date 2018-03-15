@@ -37,6 +37,7 @@ import pubg.radar.deserializer.channel.ActorChannel.Companion.airDropLocation
 import pubg.radar.deserializer.channel.ActorChannel.Companion.corpseLocation
 import pubg.radar.deserializer.channel.ActorChannel.Companion.droppedItemLocation
 import pubg.radar.deserializer.channel.ActorChannel.Companion.visualActors
+import pubg.radar.deserializer.channel.ActorChannel.Companion.weapons
 import pubg.radar.sniffer.Sniffer.Companion.preDirection
 import pubg.radar.sniffer.Sniffer.Companion.preSelfCoords
 import pubg.radar.sniffer.Sniffer.Companion.selfCoords
@@ -45,6 +46,7 @@ import pubg.radar.struct.Archetype
 import pubg.radar.struct.Archetype.*
 import pubg.radar.struct.NetworkGUID
 import pubg.radar.struct.cmd.ActorCMD
+import pubg.radar.struct.cmd.ActorCMD.actorHealth
 import pubg.radar.struct.cmd.ActorCMD.actorWithPlayerState
 import pubg.radar.struct.cmd.ActorCMD.playerStateToActor
 import pubg.radar.struct.cmd.GameStateCMD.ElapsedWarningDuration
@@ -60,6 +62,7 @@ import pubg.radar.struct.cmd.GameStateCMD.TotalWarningDuration
 import pubg.radar.struct.cmd.PlayerStateCMD
 import pubg.radar.struct.cmd.PlayerStateCMD.attacks
 import pubg.radar.struct.cmd.PlayerStateCMD.playerNames
+import pubg.radar.struct.cmd.PlayerStateCMD.playerNumKills
 import pubg.radar.struct.cmd.PlayerStateCMD.selfID
 import pubg.radar.util.PlayerProfile.Companion.query
 import pubg.radar.util.tuple4
@@ -171,6 +174,9 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     private lateinit var compaseFont: BitmapFont
     private lateinit var compaseFontShadow: BitmapFont
     private lateinit var littleFontShadow: BitmapFont
+    private lateinit var hporange: BitmapFont
+    private lateinit var hpred: BitmapFont
+    private lateinit var hpgreen: BitmapFont
 
 
     private val tileZooms = listOf("256", "512", "1024", "2048", "4096"/*, "8192"*/)
@@ -184,6 +190,9 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     private val aimStartTime = HashMap<NetworkGUID, Long>()
     private val attackLineStartTime = LinkedList<Triple<NetworkGUID, NetworkGUID, Long>>()
     private val pinLocation = Vector2()
+
+
+
     private var filterWeapon = -1
     private var filterAttach = 1
     private var filterLvl2 = 1
@@ -209,14 +218,18 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     private var toggleVehicles = -1
     private var toggleVNames = 1
     private var drawgrid = -1
+    private var nameToggles = 1
 
-    private fun Vector2.windowToMap() =
+    private fun windowToMap(x: Float, y: Float) =
             Vector2(selfCoords.x + (x - windowWidth / 2.0f) * camera.zoom * windowToMapUnit + screenOffsetX,
                     selfCoords.y + (y - windowHeight / 2.0f) * camera.zoom * windowToMapUnit + screenOffsetY)
 
-    private fun Vector2.mapToWindow() =
+    private fun mapToWindow(x: Float, y: Float) =
             Vector2((x - selfCoords.x - screenOffsetX) / (camera.zoom * windowToMapUnit) + windowWidth / 2.0f,
                     (y - selfCoords.y - screenOffsetY) / (camera.zoom * windowToMapUnit) + windowHeight / 2.0f)
+
+    fun Vector2.mapToWindow() = mapToWindow(x, y)
+    fun Vector2.windowToMap() = windowToMap(x, y)
 
 
     override fun scrolled(amount: Int): Boolean {
@@ -283,6 +296,10 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         // Toggle Transparent Player Icons
             F7 -> toggleVehicles = toggleVehicles * -1
             F6 -> toggleVNames = toggleVNames * -1
+
+            F8 -> {if (nameToggles < 6) {nameToggles += 1}
+                if (nameToggles == 6) {nameToggles = 1}
+            }
 
         // Zoom In/Out || Overrides Max/Min Zoom
             F9 -> camera.zoom = camera.zoom + 0.00525f
@@ -437,6 +454,15 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         param.color = RED
         param.size = 12
         menuFontOFF = generator.generateFont(param)
+        param.color = ORANGE
+        param.size = 10
+        hporange = generator.generateFont(param)
+        param.color = GREEN
+        param.size = 10
+        hpgreen = generator.generateFont(param)
+        param.color = RED
+        param.size = 10
+        hpred = generator.generateFont(param)
 
         generatorHub.dispose()
         generatorNumber.dispose()
@@ -580,10 +606,19 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
             else
                 espFontShadow.draw(spriteBatch, "THROW", 200f, windowHeight - 25f)
 
-            if (drawgrid == 1)
-                espFont.draw(spriteBatch, "GRID", 260f, windowHeight - 25f)
+//            if (drawgrid == 1)
+//                espFont.draw(spriteBatch, "GRID", 260f, windowHeight - 25f)
+//            else
+//                espFontShadow.draw(spriteBatch, "GRID", 260f, windowHeight - 25f)
+            if(drawmenu==1)
+                espFont.draw(spriteBatch, "Menu ON", 270f, windowHeight - 25f)
             else
-                espFontShadow.draw(spriteBatch, "GRID", 260f, windowHeight - 25f)
+                espFontShadow.draw(spriteBatch, "Menu OFF", 270f, windowHeight - 25f)
+
+
+            val num = nameToggles
+            espFontShadow.draw(spriteBatch, "Player Info:: $num", 270f, windowHeight - 42f)
+
 
 
             val pinDistance = (pinLocation.cpy().sub(selfX, selfY).len() / 100).toInt()
@@ -674,7 +709,11 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                     menuFontOFF.draw(spriteBatch, "Min Zoom", 230f, windowHeight / 2 - 46f)
                 else
                     menuFont.draw(spriteBatch, ("%.4f").format(camnum), 230f, windowHeight / 2 - 47f)
+
+
             }
+
+
 
             if (drawcompass == 1) {
                 spriteBatch.draw(bg_compass, windowWidth / 2 - 168f, windowHeight / 2 - 168f)
@@ -1276,70 +1315,77 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     }
 
 
-   /* private fun drawPlayerNames(players: MutableList<renderInfo>?) {
-        players?.forEach {
-            val zoom = camera.zoom
-            val (actor, x, y, _) = it
-            if (actor != null && actor.isACharacter) {
-                //actor!!
-                val health = ActorCMD.actorHealth[actor.netGUID] ?: 100f
-                val playerStateGUID = actorWithPlayerState[actor.netGUID] ?: return@forEach
-                val name = playerNames[playerStateGUID] ?: return@forEach
-                val numKills = PlayerStateCMD.playerNumKills[playerStateGUID] ?: 0
-                val teamNumber = PlayerStateCMD.teamNumbers[playerStateGUID] ?: 0
-                val (sx, sy) = Vector2(x, y).mapToWindow()
-                val df = DecimalFormat("###.#")
-                query(name)
-
-
-                val width = healthBarWidth * zoom
-                val height = healthBarHeight * zoom
-                val backgroundRadius = (playerRadius + 2000f) * zoom
-                val hpY = y + backgroundRadius + height / 2
-
-                draw(Filled) {
-                    val healthWidth = (health / 100.0 * width).toFloat()
-                    color = when {
-                        health > 80f -> GREEN
-                        health > 33f -> ORANGE
-                        else -> RED
-                    }
-
-                        nameFont.draw(spriteBatch,
-                                        "|N: $name\n" +
-                                        "|H: ($${df.format(health)})\n" +
-                                        "|K: ($numKills)\nTN.($teamNumber)",
-                                sx + 20, windowHeight - sy + 20)
-                                rectLine(x - width / 2, hpY, x - width / 2 + healthWidth, hpY, height)
-
-
-
-                }
-            }
-        }
-    } */
-
     fun drawPlayerNames(players: MutableList<renderInfo>?, selfX: Float, selfY: Float) {
+
         players?.forEach {
             val (actor, x, y, _) = it
             actor!!
             val dir = Vector2(x - selfX, y - selfY)
             val distance = (dir.len() / 100).toInt()
             //  val angle = ((dir.angle() + 90) % 360).toInt()
-            val (sx, sy) = Vector2(x, y).mapToWindow()
+            val (sx, sy) = mapToWindow(x, y)
             val playerStateGUID = actorWithPlayerState[actor.netGUID] ?: return@forEach
             val name = playerNames[playerStateGUID] ?: return@forEach
             //   val teamNumber = teamNumbers[playerStateGUID] ?: 0
-            val numKills = PlayerStateCMD.playerNumKills[playerStateGUID] ?: 0
-            val health = ActorCMD.actorHealth[actor.netGUID] ?: 100f
+            val numKills = playerNumKills[playerStateGUID] ?: 0
+            val health = actorHealth[actor.netGUID] ?: 100f
             val equippedWeapons = actorHasWeapons[actor.netGUID]
             val df = DecimalFormat("###.#")
             var weapon: String? = ""
+            if (equippedWeapons != null) {
+                for (w in equippedWeapons) {
+                    val a = weapons[w] ?: continue
+                    val result = a.archetype.pathName.split("_")
+                    weapon += "|"+ result[2].substring(4) + "\n"
+                }
+            }
+            when (nameToggles) {
+                1 -> {
 
-                nameFont.draw(spriteBatch, "${distance}m\n" +
-                        "|N:$name\n" +
-                        "|K:$numKills || H:${df.format(health)}]\n" +
-                        "$weapon", sx + 20, windowHeight - sy + 20)
+
+                    // Change color of hp
+                    val healthText = health
+                    when {
+                        healthText > 80f -> hpgreen.draw(spriteBatch, "\n${df.format(health)}", sx + 40, windowHeight - sy + 8)
+                        healthText > 33f -> hporange.draw(spriteBatch, "\n${df.format(health)}", sx + 40, windowHeight - sy + 8)
+                        else -> hpred.draw(spriteBatch, "\n${df.format(health)}", sx + 40, windowHeight - sy + 8)
+
+                    }
+                    nameFont.draw(spriteBatch, "|N: $name\n|D: ${distance}m\n" +
+                            "|H:\n" +
+                            "|W: $weapon",
+                            sx + 20, windowHeight - sy + 20)
+
+                }
+                2 -> {
+                    nameFont.draw(spriteBatch, "${distance}m\n" +
+                            "|N:$name\n" +
+                            "|K:$numKills || H:${df.format(health)}\n" +
+                            "$weapon", sx + 20, windowHeight - sy + 20)
+                }
+                3 -> {
+                    nameFont.draw(spriteBatch, "${distance}m\n" +
+                            "|N:$name\n" +
+                            "|K:$numKills || H:${df.format(health)}"
+                            ,
+                            sx + 20, windowHeight - sy + 20)
+                }
+                4 -> {
+                    nameFont.draw(spriteBatch, "${distance}m | H:${df.format(health)}]\n" +
+                            "$weapon", sx + 20, windowHeight - sy + 20)
+                }
+                5 -> {
+
+                    nameFont.draw(spriteBatch, "${distance}m\n" +
+                            "Health:${df.format(health)}\n", sx + 20, windowHeight - sy + 20)
+                }
+
+            }
+
+
+
+
+
         }
     }
 
