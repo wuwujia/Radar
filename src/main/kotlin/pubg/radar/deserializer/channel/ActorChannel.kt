@@ -133,6 +133,7 @@ class ActorChannel(ChIndex: Int, client: Boolean = true) : Channel(ChIndex, CHTY
                     selfID = actor.netGUID
                     while (outPayload.notEnd())
                         charmovecomp(outPayload)
+                       // VehicleSyncComponent(outPayload)
                 }
             } catch (e: Exception) {
             }
