@@ -279,36 +279,42 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
 
         when (keycode) {
 
+        // Change Player Info
+            F1 -> {if (nameToggles < 6) {nameToggles += 1}
+                if (nameToggles == 6) {nameToggles = 1}
+            }
+
+        // Other Filter Keybinds
+            F2 -> drawcompass = drawcompass * -1
+            F3 -> drawgrid = drawgrid * -1
+
+        // Toggle View Line
+            F4 -> toggleView = toggleView * -1
+
+        // Toggle Vehicles
+            F5 -> toggleVehicles = toggleVehicles * -1
+            F6 -> toggleVNames = toggleVNames * -1
+
+        // Toggle Menu
+            F12 -> drawmenu = drawmenu * -1
+
         // Icon Filter Keybinds
-            INSERT -> drawmenu = drawmenu * -1
-            HOME -> drawcompass = drawcompass * -1
-            END -> drawgrid = drawgrid * -1
-            NUMPAD_0 -> filterThrow = filterThrow * -1
-            NUMPAD_4 -> filterWeapon = filterWeapon * -1
-            NUMPAD_1 -> filterAttach = filterAttach * -1
-            NUMPAD_5 -> filterLvl2 = filterLvl2 * -1
-            NUMPAD_2 -> filterScope = filterScope * -1
-            NUMPAD_6 -> filterHeals = filterHeals * -1
-            NUMPAD_3 -> filterAmmo = filterAmmo * -1
+            NUMPAD_1 -> filterWeapon = filterWeapon * -1
+            NUMPAD_2 -> filterLvl2 = filterLvl2 * -1
+            NUMPAD_3 -> filterHeals = filterHeals * -1
+            NUMPAD_4 -> filterThrow = filterThrow * -1
+            NUMPAD_5 -> filterAttach = filterAttach * -1
+            NUMPAD_6 -> filterScope = filterScope * -1
+            NUMPAD_0 -> filterAmmo = filterAmmo * -1
+
+        // Zoom (Loot, Combat, Scout)
             NUMPAD_7 -> camera.zoom = 1 / 8f
             NUMPAD_8 -> camera.zoom = 1 / 12f
             NUMPAD_9 -> camera.zoom = 1 / 24f
 
-        // Toggle Transparent Player Icons
-            F7 -> toggleVehicles = toggleVehicles * -1
-            F6 -> toggleVNames = toggleVNames * -1
-
-            F8 -> {if (nameToggles < 6) {nameToggles += 1}
-                if (nameToggles == 6) {nameToggles = 1}
-            }
-
         // Zoom In/Out || Overrides Max/Min Zoom
             PLUS -> camera.zoom = camera.zoom + 0.00525f
             MINUS -> camera.zoom = camera.zoom - 0.00525f
-
-        // Toggle View Line
-            F11 -> toggleView = toggleView * -1
-
 
         }
         return false
