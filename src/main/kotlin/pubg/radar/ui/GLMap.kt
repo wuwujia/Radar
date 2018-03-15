@@ -611,13 +611,13 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
 //            else
 //                espFontShadow.draw(spriteBatch, "GRID", 260f, windowHeight - 25f)
             if(drawmenu==1)
-                espFont.draw(spriteBatch, "Menu ON", 270f, windowHeight - 25f)
+                espFont.draw(spriteBatch, "[INS] Menu ON", 270f, windowHeight - 25f)
             else
-                espFontShadow.draw(spriteBatch, "Menu OFF", 270f, windowHeight - 25f)
+                espFontShadow.draw(spriteBatch, "[INS] Menu OFF", 270f, windowHeight - 25f)
 
 
             val num = nameToggles
-            espFontShadow.draw(spriteBatch, "Player Info:: $num", 270f, windowHeight - 42f)
+            espFontShadow.draw(spriteBatch, "[F8] Player Info: $num", 270f, windowHeight - 42f)
 
 
 
