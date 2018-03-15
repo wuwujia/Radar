@@ -38,6 +38,10 @@ object CMD {
     }
 
     fun Bunch.propertyString() = readString()
+    fun Bunch.propertyVectorNormal() = readFixedVector(1, 16)
+    fun Bunch.propertyVector10() = readVector(10, 24)
+    fun Bunch.propertyVectorQ() = readVector(1, 20)
+    fun Bunch.propertyUInt64() = readInt64()
 
     val processors: Map<Archetype, cmdProcessor>
 

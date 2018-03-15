@@ -3,11 +3,14 @@ package pubg.radar.struct
 import com.badlogic.gdx.math.Vector3
 import pubg.radar.struct.Archetype.*
 import pubg.radar.struct.Archetype.Companion.fromArchetype
+import java.util.concurrent.ConcurrentHashMap
 
 enum class Archetype { //order matters, it affects the order of drawing
     Other,
     GameState,
     DroopedItemGroup,
+    WeaponProcessor,
+    Weapon,
     Grenade,
     TwoSeatBoat,
     FourSeatDU,
@@ -31,6 +34,7 @@ enum class Archetype { //order matters, it affects the order of drawing
                 archetype.contains("Default__TSLGameState") -> GameState
                 archetype.contains("Default__Player") -> Player
                 archetype.contains("DroppedItemGroup") -> DroopedItemGroup
+                archetype.contains("Default__WeaponProcessor") -> WeaponProcessor
                 archetype.contains("Aircraft") -> Plane
                 archetype.contains("Parachute") -> Parachute
                 archetype.contains(Regex("(bike|Sidecart)", RegexOption.IGNORE_CASE)) -> TwoSeatBike
@@ -63,6 +67,8 @@ class Actor(val netGUID: NetworkGUID, private val archetypeGUID: NetworkGUID, va
     var attachTo: NetworkGUID? = null
     var beAttached = false
     var isStatic = false
+    var attachParent: NetworkGUID? = null
+    var attachChildren = ConcurrentHashMap<NetworkGUID, NetworkGUID>()
 
     override fun toString(): String {
         val ow: Any = this.owner ?: ""

@@ -31,6 +31,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import pubg.radar.*
+import pubg.radar.deserializer.channel.ActorChannel.Companion.actorHasWeapons
 import pubg.radar.deserializer.channel.ActorChannel.Companion.actors
 import pubg.radar.deserializer.channel.ActorChannel.Companion.airDropLocation
 import pubg.radar.deserializer.channel.ActorChannel.Companion.corpseLocation
@@ -43,6 +44,7 @@ import pubg.radar.struct.Actor
 import pubg.radar.struct.Archetype
 import pubg.radar.struct.Archetype.*
 import pubg.radar.struct.NetworkGUID
+import pubg.radar.struct.cmd.ActorCMD
 import pubg.radar.struct.cmd.ActorCMD.actorWithPlayerState
 import pubg.radar.struct.cmd.ActorCMD.playerStateToActor
 import pubg.radar.struct.cmd.GameStateCMD.ElapsedWarningDuration
@@ -55,12 +57,14 @@ import pubg.radar.struct.cmd.GameStateCMD.RedZoneRadius
 import pubg.radar.struct.cmd.GameStateCMD.SafetyZonePosition
 import pubg.radar.struct.cmd.GameStateCMD.SafetyZoneRadius
 import pubg.radar.struct.cmd.GameStateCMD.TotalWarningDuration
+import pubg.radar.struct.cmd.PlayerStateCMD
 import pubg.radar.struct.cmd.PlayerStateCMD.attacks
 import pubg.radar.struct.cmd.PlayerStateCMD.playerNames
 import pubg.radar.struct.cmd.PlayerStateCMD.selfID
 import pubg.radar.util.PlayerProfile.Companion.query
 import pubg.radar.util.tuple4
 import wumo.pubg.struct.cmd.TeamCMD.team
+import java.text.DecimalFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.pow
@@ -123,12 +127,16 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     private lateinit var corpseboximage: Texture
     private lateinit var airdropimage: Texture
     private lateinit var bg_compass: Texture
+    private lateinit var menu: Texture
     private lateinit var largeFont: BitmapFont
     private lateinit var littleFont: BitmapFont
     private lateinit var nameFont: BitmapFont
     private lateinit var itemFont: BitmapFont
     private lateinit var fontCamera: OrthographicCamera
     private lateinit var itemCamera: OrthographicCamera
+    private lateinit var menuFont: BitmapFont
+    private lateinit var menuFontOn: BitmapFont
+    private lateinit var menuFontOFF: BitmapFont
     private lateinit var camera: OrthographicCamera
     private lateinit var alarmSound: Sound
     private lateinit var hubpanel: Texture
@@ -176,6 +184,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     private var filterAmmo = 1
     private var filterThrow = 1
     private var drawcompass = -1
+    private var drawmenu = 1
     private var toggleView = -1
     private var scopesToFilter = arrayListOf("")
     private var weaponsToFilter = arrayListOf("")
@@ -249,6 +258,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         when (keycode) {
 
         // Icon Filter Keybinds
+            INSERT -> drawmenu = drawmenu * -1
             HOME -> drawcompass = drawcompass * -1
             END -> drawgrid = drawgrid * -1
             NUMPAD_0 -> filterThrow = filterThrow * -1
@@ -315,6 +325,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         alarmSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Alarm.wav"))
         hubpanel = Texture(Gdx.files.internal("images/hub_panel.png"))
         bg_compass = Texture(Gdx.files.internal("images/bg_compass.png"))
+        menu = Texture(Gdx.files.internal("images/menu.png"))
         hubpanelblank = Texture(Gdx.files.internal("images/hub_panel_blank_long.png"))
         corpseboximage = Texture(Gdx.files.internal("icons/box.png"))
         airdropimage = Texture(Gdx.files.internal("icons/airdrop.png"))
@@ -401,6 +412,15 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         littleFont = generator.generateFont(param)
         param.color = Color(0f, 0f, 0f, 0.5f)
         littleFontShadow = generator.generateFont(param)
+        param.color = WHITE
+        param.size = 12
+        menuFont = generator.generateFont(param)
+        param.color = GREEN
+        param.size = 12
+        menuFontOn = generator.generateFont(param)
+        param.color = RED
+        param.size = 12
+        menuFontOFF = generator.generateFont(param)
 
         generatorHub.dispose()
         generatorNumber.dispose()
@@ -554,7 +574,8 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
             val (x, y) = pinLocation.mapToWindow()
 
             safeZoneHint()
-            drawPlayerNames(typeLocation[Player])
+            drawPlayerNames(typeLocation[Player], selfX, selfY)
+
 
             //     drawMyself(tuple4(null, selfX, selfY, selfDir.angle()))
 
@@ -562,6 +583,82 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                 drawGrid()
             }
 
+            val camnum = camera.zoom
+            if (drawmenu == 1) {
+                spriteBatch.draw(menu, 40f, windowHeight / 2 - 60f)
+                if (filterWeapon != 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 122f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 122f)
+
+                if (filterLvl2 != 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 110f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 110f)
+
+                if (filterHeals != 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 97f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 97f)
+
+                if (filterThrow != 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 83f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 83f)
+
+                if (filterAttach != 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 70f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 70f)
+
+                if (filterScope != 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 58f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 58f)
+
+                if (filterAmmo != 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 45f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 45f)
+
+                if (drawcompass != 1)
+
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 32f)
+                else
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 32f)
+
+                if (toggleVehicles != 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 17f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 17f)
+
+                if (toggleVNames != 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 + 6f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 + 6f)
+
+                if (toggleView == 1)
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 - 8f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 - 8f)
+
+                if (drawgrid == 1)
+
+                    menuFontOn.draw(spriteBatch, "On", 230f, windowHeight / 2 - 20f)
+                else
+                    menuFontOFF.draw(spriteBatch, "Off", 230f, windowHeight / 2 - 20f)
+
+                if (camera.zoom == 0.0100f)
+                    menuFontOFF.draw(spriteBatch, "Max Zoom", 230f, windowHeight / 2 - 33f)
+                else
+                    menuFont.draw(spriteBatch, ("%.4f").format(camnum), 230f, windowHeight / 2 - 34f)
+
+
+                if (camera.zoom == 1f)
+                    menuFontOFF.draw(spriteBatch, "Min Zoom", 230f, windowHeight / 2 - 46f)
+                else
+                    menuFont.draw(spriteBatch, ("%.4f").format(camnum), 230f, windowHeight / 2 - 47f)
+            }
 
             if (drawcompass == 1) {
                 spriteBatch.draw(bg_compass, windowWidth / 2 - 168f, windowHeight / 2 - 168f)
@@ -1084,20 +1181,72 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         }
     }
 
-    private fun drawPlayerNames(players: MutableList<renderInfo>?) {
+   /* private fun drawPlayerNames(players: MutableList<renderInfo>?) {
+        players?.forEach {
+            val zoom = camera.zoom
+            val (actor, x, y, _) = it
+            if (actor != null && actor.isACharacter) {
+                //actor!!
+                val health = ActorCMD.actorHealth[actor.netGUID] ?: 100f
+                val playerStateGUID = actorWithPlayerState[actor.netGUID] ?: return@forEach
+                val name = playerNames[playerStateGUID] ?: return@forEach
+                val numKills = PlayerStateCMD.playerNumKills[playerStateGUID] ?: 0
+                val teamNumber = PlayerStateCMD.teamNumbers[playerStateGUID] ?: 0
+                val (sx, sy) = Vector2(x, y).mapToWindow()
+                val df = DecimalFormat("###.#")
+                query(name)
+
+
+                val width = healthBarWidth * zoom
+                val height = healthBarHeight * zoom
+                val backgroundRadius = (playerRadius + 2000f) * zoom
+                val hpY = y + backgroundRadius + height / 2
+
+                draw(Filled) {
+                    val healthWidth = (health / 100.0 * width).toFloat()
+                    color = when {
+                        health > 80f -> GREEN
+                        health > 33f -> ORANGE
+                        else -> RED
+                    }
+
+                        nameFont.draw(spriteBatch,
+                                        "|N: $name\n" +
+                                        "|H: ($${df.format(health)})\n" +
+                                        "|K: ($numKills)\nTN.($teamNumber)",
+                                sx + 20, windowHeight - sy + 20)
+                                rectLine(x - width / 2, hpY, x - width / 2 + healthWidth, hpY, height)
+
+
+
+                }
+            }
+        }
+    } */
+
+    fun drawPlayerNames(players: MutableList<renderInfo>?, selfX: Float, selfY: Float) {
         players?.forEach {
             val (actor, x, y, _) = it
             actor!!
+            val dir = Vector2(x - selfX, y - selfY)
+            val distance = (dir.len() / 100).toInt()
+            //  val angle = ((dir.angle() + 90) % 360).toInt()
+            val (sx, sy) = Vector2(x, y).mapToWindow()
             val playerStateGUID = actorWithPlayerState[actor.netGUID] ?: return@forEach
             val name = playerNames[playerStateGUID] ?: return@forEach
-            val (sx, sy) = Vector2(x, y).mapToWindow()
-            query(name)
-            nameFont.draw(spriteBatch, "$name "/* +
-                    "/($numKills)\n$teamNumber*/
-                    , sx + 2, windowHeight - sy - 2)
+            //   val teamNumber = teamNumbers[playerStateGUID] ?: 0
+            val numKills = PlayerStateCMD.playerNumKills[playerStateGUID] ?: 0
+            val health = ActorCMD.actorHealth[actor.netGUID] ?: 100f
+            val equippedWeapons = actorHasWeapons[actor.netGUID]
+            val df = DecimalFormat("###.#")
+            var weapon: String? = ""
+
+                nameFont.draw(spriteBatch, "${distance}m\n" +
+                        "|N:$name\n" +
+                        "|K:$numKills || H:${df.format(health)}]\n" +
+                        "$weapon", sx + 20, windowHeight - sy + 20)
         }
     }
-
 
     private var lastPlayTime = System.currentTimeMillis()
     private fun safeZoneHint() {
@@ -1180,6 +1329,9 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         iconImages.iconSheet.dispose()
         compaseFont.dispose()
         compaseFontShadow.dispose()
+        menuFont.dispose()
+        menuFontOn.dispose()
+        menuFontOFF.dispose()
 
         var cur = 0
         tileZooms.forEach {

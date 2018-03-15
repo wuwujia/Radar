@@ -35,6 +35,7 @@ object PlayerStateCMD : GameListener {
     val teamNumbers = ConcurrentHashMap<NetworkGUID, Int>()
     val attacks = ConcurrentLinkedQueue<Pair<NetworkGUID, NetworkGUID>>()//A -> B
     var selfID = NetworkGUID(0)
+    var selfStateID = NetworkGUID(0)
 
     fun process(actor: Actor, bunch: Bunch, waitingHandle: Int): Boolean {
         with(bunch) {
@@ -42,150 +43,236 @@ object PlayerStateCMD : GameListener {
             //item_dbg {""}
             when (waitingHandle) {
                 1 -> {
-                    val bHidden = readBit()
-//          println("bHidden=$bHidden")
+                    //int
+                    //Ranking;
+                    //0x0448(0x0004) (BlueprintVisible, BlueprintReadOnly, Net, ZeroConstructor, Transient, IsPlainOldData)
+//indicate player's death
+                    val Ranking = propertyInt()
+                    //   println("${playerNames[actor.netGUID]}${actor.netGUID} Ranking=$Ranking")
+
+
                 }
                 2 -> {
-                    val bReplicateMovement = readBit()
-//          println("bHidden=$bReplicateMovement")
+                    //unsigned char
+                    //UnknownData00[0x4];
+                    //0x044C(0x0004) MISSED OFFSET
+
+
                 }
                 3 -> {
-                    val bTearOff = readBit()
-//          println("bHidden=$bTearOff")
+                    //struct FString
+// AccountId;
+// 0x0450(0x0010) (Net, ZeroConstructor)
+                    val AccountId = propertyString()
+                    //    println("${actor.netGUID} AccountId=$AccountId")
+
+
                 }
                 4 -> {
-                    val role = readInt(ROLE_MAX)
+                    //unsigned char
+// bKilled : 1;
+// 0x0460(0x0001)
+
+
                 }
                 5 -> {
-                    val (ownerGUID, owner) = propertyObject()
+                    //unsigned char
+// UnknownData01[0x7];
+// 0x0461(0x0007) MISSED OFFSET
+
+
+                }
+                6 -> {
+                    //struct FString
+                    //ReportToken;
+                    //0x0468(0x0010) (Net, ZeroConstructor, Transient)
+                    val ReportToken = propertyString()
+                    //   println("${actor.netGUID} ReportToken=$ReportToken")
+
                 }
                 7 -> {
-                    val (a, obj) = readObject()
+                    //struct FEmoteBitArray
+                    //EmoteBitArray;
+// 0x0478(0x0020) (Net)
+
+
+                }
+                8 -> {
+                    //bool
+// bShowMapMarker;
+// 0x0498(0x0001) (BlueprintVisible, ZeroConstructor, IsPlainOldData)
+
+
+                }
+                9 -> {
+                    //unsigned char
+                    //UnknownData02[0x3];
+                    //0x0499(0x0003) MISSED OFFSET
+                    val role = readInt(ROLE_MAX)
+
+                }
+                10 -> {
+                    //struct FVector2D
+// MapMarkerPosition;
+                    //0x049C(0x0008) (BlueprintVisible, IsPlainOldData)
+
+
+                }
+                11 -> {
+                    //unsigned char
+// UnknownData03[0x4];
+// 0x04A4(0x0004) MISSED OFFSET
+
+                    readInt(ROLE_MAX)
+
+
+                }
+                12 -> {
+                    //TArray<struct FReplicatedCastableItem>
+// ReplicatedCastableItems;
+                    //0x04A8(0x0010) (Net, ZeroConstructor, Transient)
+
+
                 }
                 13 -> {
-                    readInt(ROLE_MAX)
+                    //bool
+                    //bEmptyReplicatedCastableItems;
+                    //0x04B8(0x0001) (ZeroConstructor, IsPlainOldData)
+
+
+                }
+                14 -> {
+                    //EObserverAuthorityType
+// ObserverAuthorityType;
+// 0x04B9(0x0001) (Net, ZeroConstructor, Transient, IsPlainOldData)
+                    val ObserverAuthorityType = readInt(4)
+                    //   println("${playerNames[actor.netGUID]}${actor.netGUID} ObserverAuthorityType=$ObserverAuthorityType")
+
+
+                }
+                15 -> {
+                    //unsigned char
+// UnknownData04[0x2];
+// 0x04BA(0x0002) MISSED OFFSET
+
+
                 }
                 16 -> {
-                    val score = propertyFloat()
-                }
-                17 -> {
-                    val ping = propertyByte()
-                }
-                18 -> {
-                    val name = propertyString()
-                    playerNames[actor.netGUID] = name
-                    //query(name)
-//          println("${actor.netGUID} playerID=$name")
-                }
-                19 -> {
-                    val playerID = propertyInt()
-//          println("${actor.netGUID} playerID=$playerID")
-                }
-                20 -> {
-                    val bIsSpectator = propertyBool()
-//        println("${actor.netGUID} bIsSpectator=$bIsSpectator")
-                }
-                21 -> {
-                    val bOnlySpectator = propertyBool()
-//        println("${actor.netGUID} bOnlySpectator=$bOnlySpectator")
-                }
-                22 -> {
-                    val isABot = propertyBool()
-//        println("${actor.netGUID} isABot=$isABot")
-                }
-                23 -> {
-                    val bIsInactive = propertyBool()
-//        println("${actor.netGUID} bIsInactive=$bIsInactive")
-                }
-                24 -> {
-                    val bFromPreviousLevel = propertyBool()
-//        println("${actor.netGUID} bFromPreviousLevel=$bFromPreviousLevel")
-                }
-                25 -> {
-                    val StartTime = propertyInt()
-//        println("${actor.netGUID} StartTime=$StartTime")
-                }
-                26 -> {
-                    val uniqueId = propertyNetId()
-                    uniqueIds[uniqueId] = actor.netGUID
-//        println("${playerNames[actor.netGUID]}${actor.netGUID} uniqueId=$uniqueId")
-                }
-                27 -> {//indicate player's death
-                    val Ranking = propertyInt()
-//        println("${playerNames[actor.netGUID]}${actor.netGUID} Ranking=$Ranking")
-                }
-                28 -> {
-                    val AccountId = propertyString()
-//        println("${actor.netGUID} AccountId=$AccountId")
-                }
-                29 -> {
-                    val ReportToken = propertyString()
-//        println("${actor.netGUID} ReportToken=$ReportToken")
-                }
-                31 -> {
-                    val ObserverAuthorityType = readInt(4)
-//        println("${playerNames[actor.netGUID]}${actor.netGUID} ObserverAuthorityType=$ObserverAuthorityType")
-                }
-                32 -> {
+                    //int
+// TeamNumber;
+// 0x04BC(0x0004) (Net, ZeroConstructor, Transient, IsPlainOldData)
                     val teamNumber = readInt(100)
                     teamNumbers[actor.netGUID] = teamNumber
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} TeamNumber=$teamNumber")
+                    //      println("${playerNames[actor.netGUID]}${actor.netGUID} TeamNumber=$teamNumber")
+
                 }
-                33 -> {
+                17 -> {
+                    //unsigned char
+// bIsZombie : 1;
+                    //0x04C0(0x0001) (Net, Transient)
                     val bIsZombie = propertyBool()
-//          println("bIsZombie=$bIsZombie")
+                    //     println("bIsZombie=$bIsZombie")
+
+
                 }
-                34 -> {
-                    val scoreByDamage = propertyFloat()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} scoreByDamage=$scoreByDamage")
+                18 -> {
+                    //unsigned char
+                    //UnknownData05[0x7];
+                    //0x04C1(0x0007) MISSED OFFSET
+                    val name = propertyString()
+                    playerNames[actor.netGUID] = name
+//query(name)
+                    println("${actor.netGUID} playerID=$name")
+
+
                 }
-                35 -> {
-                    val ScoreByKill = propertyFloat()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} ScoreByKill=$ScoreByKill")
+                19 -> {
+                    //struct FTslPlayerScores
+                    //PlayerScores;
+                    //0x04C8(0x0010) (BlueprintVisible, BlueprintReadOnly, Net, Transient)
+
+
                 }
-                36 -> {
-                    val ScoreByRanking = propertyFloat()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} ScoreByRanking=$ScoreByRanking")
+                20 -> {
+                    //struct FTslPlayerStatistics
+                    //PlayerStatistics;
+                    //0x04D8(0x0004) (Net, Transient)
+
+
                 }
-                37 -> {
-                    val ScoreFactor = propertyFloat()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} ScoreFactor=$ScoreFactor")
+                21 -> {
+                    //struct FTslPlayerStatisticsForOwner
+                    // PlayerStatisticsForOwner;
+                    //0x04DC(0x0010) (Net, Transient)
+
+
                 }
-                38 -> {
-                    val NumKills = propertyInt()
-                    playerNumKills[actor.netGUID] = NumKills
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} NumKills=$NumKills")
+                22 -> {
+                    //unsigned char
+                    //UnknownData06[0xB4];
+                    //0x04EC(0x00B4) MISSED OFFSET
+
+
                 }
-                39 -> {
-                    val TotalMovedDistanceMeter = propertyFloat()
-                    selfID = actor.netGUID//only self will get this update
-//          val NumKills = propertyInt()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} TotalMovedDistanceMeter=$TotalMovedDistanceMeter")
+                23 -> {
+                    //TArray<struct FReplicatedEquipableItem>
+                    //ReplicatedEquipableItems;
+                    //0x05A0(0x0010) (Net, ZeroConstructor, Transient)
+
+
                 }
-                40 -> {
-                    val TotalGivenDamages = propertyFloat()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} TotalGivenDamages=$TotalGivenDamages")
+                24 -> {
+                    //unsigned char
+                    //UnknownData07[0x1C];
+                    //0x05B0(0x001C) MISSED OFFSET
+
+                    val uniqueId = propertyNetId()
+                    uniqueIds[uniqueId] = actor.netGUID
+                    println("2: ${playerNames[actor.netGUID]}${actor.netGUID} uniqueId=$uniqueId")
+
                 }
-                41 -> {
-                    val LongestDistanceKill = propertyFloat()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} LongestDistanceKill=$LongestDistanceKill")
+                25 -> {
+                    //unsigned char
+                    // bQuitter : 1;
+// 0x05CC(0x0001)
+
+
                 }
-                42 -> {
-                    val HeadShots = propertyInt()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} HeadShots=$HeadShots")
+                26 -> {
+                    //unsigned char
+                    // UnknownData08[0x12E];
+// 0x05CD(0x012E) MISSED OFFSET
+
+                    val uniqueId = propertyNetId()
+                    uniqueIds[uniqueId] = actor.netGUID
+                    println("1: ${playerNames[actor.netGUID]}${actor.netGUID} uniqueId=$uniqueId")
+
+
                 }
-                44 -> {//bIsInAircraft
+                27 -> {
+                    //bool
+                    // bIsInAircraft;
+                    //0x06FB(0x0001) (Net, ZeroConstructor, IsPlainOldData)
                     val bIsInAircraft = propertyBool()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} bIsInAircraft=$bIsInAircraft")
+                    //   println("${playerNames[actor.netGUID]}${actor.netGUID} bIsInAircraft=$bIsInAircraft")
+
                 }
-                45 -> {//LastHitTime
+                28 -> {
+                    //float
+                    //LastHitTime;
+                    //0x06FC(0x0004) (BlueprintVisible, Net, ZeroConstructor, IsPlainOldData)
                     val lastHitTime = propertyFloat()
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} lastHitTime=$lastHitTime")
+                    //   println("${playerNames[actor.netGUID]}${actor.netGUID} lastHitTime=$lastHitTime")
+
                 }
-                46 -> {
+                29 -> {
+                    //struct FString
+                    //CurrentAttackerPlayerNetId;
+                    //0x0700(0x0010) (BlueprintVisible, BlueprintReadOnly, Net, ZeroConstructor)
                     val currentAttackerPlayerNetId = propertyString()
                     attacks.add(Pair(uniqueIds[currentAttackerPlayerNetId]!!, actor.netGUID))
-//          println("${playerNames[actor.netGUID]}${actor.netGUID} currentAttackerPlayerNetId=$currentAttackerPlayerNetId")
+                    //println("${playerNames[actor.netGUID]}${actor.netGUID} currentAttackerPlayerNetId=$currentAttackerPlayerNetId")
+
 
                 }
                 else -> return false
