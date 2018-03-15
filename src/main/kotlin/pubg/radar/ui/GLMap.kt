@@ -851,7 +851,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
 
         }
 
-
+/*
         Gdx.gl.glEnable(GL20.GL_BLEND)
         draw(Line) {
             airDropLocation.values.forEach {
@@ -862,7 +862,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
             }
             Gdx.gl.glDisable(GL20.GL_BLEND)
         }
-
+*/
 
         val zoom = camera.zoom
         Gdx.gl.glEnable(GL20.GL_BLEND)
