@@ -13,6 +13,7 @@ import pubg.radar.struct.Actor
 import pubg.radar.struct.Archetype.*
 import pubg.radar.struct.Bunch
 import pubg.radar.struct.NetGUIDCache.Companion.guidCache
+import pubg.radar.struct.NetGuidCacheObject
 import pubg.radar.struct.NetworkGUID
 import pubg.radar.struct.cmd.CMD.propertyBool
 import pubg.radar.struct.cmd.CMD.propertyByte
@@ -26,11 +27,13 @@ import pubg.radar.struct.cmd.CMD.propertyVector100
 import pubg.radar.struct.cmd.CMD.propertyVectorNormal
 import pubg.radar.struct.cmd.CMD.propertyVectorQ
 import pubg.radar.struct.cmd.CMD.repMovement
+import pubg.radar.struct.cmd.PlayerStateCMD.selfID
 import java.util.concurrent.ConcurrentHashMap
 
-var selfAttachTo: Actor? = null
 var selfDirection = 0f
 val selfCoords = Vector2()
+var selfAttachTo: Actor? = null
+
 
 object ActorCMD : GameListener {
     init {
@@ -47,7 +50,7 @@ object ActorCMD : GameListener {
     val playerStateToActor = ConcurrentHashMap<NetworkGUID, NetworkGUID>()
     val actorHealth = ConcurrentHashMap<NetworkGUID, Float>()
 
-    fun process(actor: Actor, bunch: Bunch, waitingHandle: Int): Boolean {
+    fun process(actor: Actor, bunch: Bunch, repObj: NetGuidCacheObject?, waitingHandle: Int, data: HashMap<String, Any?>): Boolean {
         with(bunch) {
             when (waitingHandle) {
                 1 -> if (readBit()) {//bHidden
@@ -87,12 +90,18 @@ object ActorCMD : GameListener {
                 7 -> {
                     val (a, obj) = readObject()
                     val attachTo = if (a.isValid()) {
-                        actors[a]?.beAttached = true
+                        actors[a]?.attachChildren?.put(actor.netGUID, actor.netGUID)
                         a
                     } else null
-                    if (actor.attachTo != null)
-                        actors[actor.attachTo!!]?.beAttached = false
-                    actor.attachTo = attachTo
+                    if (actor.attachParent != null)
+                        actors[actor.attachParent!!]?.attachChildren?.remove(actor.netGUID)
+                    actor.attachParent = attachTo
+                    if (actor.netGUID == selfID) {
+                        selfAttachTo = if (attachTo != null)
+                            actors[actor.attachParent!!]
+                        else
+                            null
+                    }
                     bugln { ",attachTo [$actor---------> $a ${guidCache.getObjectFromNetGUID(a)} ${actors[a]}" }
                 }
                 8 -> {

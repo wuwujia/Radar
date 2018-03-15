@@ -5,12 +5,10 @@ import pubg.radar.GameListener
 import pubg.radar.register
 import pubg.radar.struct.Actor
 import pubg.radar.struct.Bunch
+import pubg.radar.struct.NetGuidCacheObject
 import pubg.radar.struct.cmd.CMD.propertyBool
-import pubg.radar.struct.cmd.CMD.propertyByte
 import pubg.radar.struct.cmd.CMD.propertyFloat
 import pubg.radar.struct.cmd.CMD.propertyInt
-import pubg.radar.struct.cmd.CMD.propertyName
-import pubg.radar.struct.cmd.CMD.propertyObject
 import pubg.radar.struct.cmd.CMD.propertyString
 import pubg.radar.struct.cmd.CMD.propertyVector
 
@@ -37,6 +35,7 @@ object GameStateCMD : GameListener {
         NumAliveTeams = 0
         RemainingTime = 0
         MatchElapsedMinutes = 0
+        NumTeams = 0
 
     }
 
@@ -59,7 +58,7 @@ object GameStateCMD : GameListener {
     var NumAliveTeams = 0
     var NumTeams = 0
 
-    fun process(actor: Actor, bunch: Bunch, waitingHandle: Int): Boolean {
+    fun process(actor: Actor, bunch: Bunch, repObj: NetGuidCacheObject?, waitingHandle: Int, data: HashMap<String, Any?>): Boolean {
         with(bunch) {
             when (waitingHandle) {
                 16 -> {
@@ -320,6 +319,7 @@ object GameStateCMD : GameListener {
                     //   float                                              LerpSafetyZoneRadius
 
 
+
                 }
             // 0x04B8(0x0004) (BlueprintVisible, BlueprintReadOnly, ZeroConstructor, Transient, IsPlainOldData)
                 56 -> {
@@ -418,6 +418,7 @@ object GameStateCMD : GameListener {
                 }
                 72 -> {
                     //     class UTimerTextBlockUpdater*                      TimeUpTimerUpdater;
+
 
 
                 }

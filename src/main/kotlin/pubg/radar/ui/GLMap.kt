@@ -151,7 +151,15 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     private lateinit var pickup: Texture
     private lateinit var arrow: Texture
     private lateinit var arrowsight: Texture
+    private lateinit var vehicleo: Texture
     private lateinit var jetski: Texture
+    private lateinit var boato: Texture
+    private lateinit var bikeo: Texture
+    private lateinit var bike3xo: Texture
+    private lateinit var buggyo: Texture
+    private lateinit var vano: Texture
+    private lateinit var pickupo: Texture
+    private lateinit var jetskio: Texture
     private lateinit var player: Texture
     private lateinit var playersight: Texture
     private lateinit var parachute: Texture
@@ -343,6 +351,14 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         pickup = Texture(Gdx.files.internal("images/pickup.png"))
         van = Texture(Gdx.files.internal("images/van.png"))
         buggy = Texture(Gdx.files.internal("images/buggy.png"))
+        boato = Texture(Gdx.files.internal("images/boato.png"))
+        bikeo = Texture(Gdx.files.internal("images/bikeo.png"))
+        jetskio = Texture(Gdx.files.internal("images/jetskio.png"))
+        bike3xo = Texture(Gdx.files.internal("images/bike3xo.png"))
+        pickupo = Texture(Gdx.files.internal("images/pickupo.png"))
+        vano = Texture(Gdx.files.internal("images/vano.png"))
+        buggyo = Texture(Gdx.files.internal("images/buggyo.png"))
+        vehicleo = Texture(Gdx.files.internal("images/vehicleo.png"))
         grenade = Texture(Gdx.files.internal("images/grenade.png"))
         iconImages = Icons(Texture(Gdx.files.internal("images/item-sprites.png")), 64)
         mapErangelTiles = mutableMapOf()
@@ -732,23 +748,23 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         val iconScale = 2f / camera.zoom
         paint(itemCamera.combined) {
 
-            droppedItemLocation.values.asSequence().filter { it.second.isNotEmpty() }
+            droppedItemLocation.values.asSequence().filter { it._2.isNotEmpty() }
                     .forEach {
-                        val (x, y) = it.first
-                        val items = it.second
+                        val (x, y) = it._1
+                        val items = it._2
                         val (sx, sy) = Vector2(x, y).mapToWindow()
                         val syFix = windowHeight - sy
 
                         items.forEach {
-                            if (it !in weaponsToFilter) {
-                                if (it !in scopesToFilter) {
-                                    if (it !in attachToFilter) {
-                                        if (it !in level2Filter) {
-                                            if (it !in ammoToFilter) {
-                                                if (it !in healsToFilter) {
-                                                    if (it !in throwToFilter) {
+                            if (items !in weaponsToFilter) {
+                                if (items !in scopesToFilter) {
+                                    if (items !in attachToFilter) {
+                                        if (items !in level2Filter) {
+                                            if (items !in ammoToFilter) {
+                                                if (items !in healsToFilter) {
+                                                    if (items !in throwToFilter) {
                                                         if (iconScale > 20 && sx > 0 && sx < windowWidth && syFix > 0 && syFix < windowHeight) {
-                                                            iconImages.setIcon(it)
+                                                            iconImages.setIcon(items)
 
                                                             // Thanks https://github.com/PubgKnown
                                                             draw(iconImages.icon,
@@ -959,7 +975,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                         val v_y = actor.velocity.y
                         if (actor.attachChildren.isNotEmpty() || v_x * v_x + v_y * v_y > 40) {
                             spriteBatch.draw(
-                                    jetski,
+                                    jetskio,
                                     sx + 2, windowHeight - sy - 2, 4.toFloat() / 2,
                                     4.toFloat() / 2, 4.toFloat(), 4.toFloat(), iconScale / 2, iconScale / 2,
                                     dir * -1, 0, 0, 64, 64, true, false
@@ -984,7 +1000,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                         val v_y = actor.velocity.y
                         if (actor.attachChildren.isNotEmpty() || v_x * v_x + v_y * v_y > 40) {
                             spriteBatch.draw(
-                                    boat,
+                                    boato,
                                     sx + 2, windowHeight - sy - 2, 4.toFloat() / 2,
                                     4.toFloat() / 2, 4.toFloat(), 4.toFloat(), iconScale / 2, iconScale / 2,
                                     dir * -1, 0, 0, 64, 64, true, false
@@ -1010,7 +1026,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                         val v_y = actor.velocity.y
                         if (actor.attachChildren.isNotEmpty() || v_x * v_x + v_y * v_y > 40) {
                             spriteBatch.draw(
-                                    bike,
+                                    bikeo,
                                     sx + 2, windowHeight - sy - 2, 4.toFloat() / 2,
                                     4.toFloat() / 2, 4.toFloat(), 4.toFloat(), iconScale / 3, iconScale / 3,
                                     dir * -1, 0, 0, 64, 64, true, false
@@ -1037,7 +1053,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                         val v_y = actor.velocity.y
                         if (actor.attachChildren.isNotEmpty() || v_x * v_x + v_y * v_y > 40) {
                             spriteBatch.draw(
-                                    buggy,
+                                    buggyo,
                                     sx + 2, windowHeight - sy - 2,
                                     2.toFloat() / 2, 2.toFloat() / 2,
                                     2.toFloat(), 2.toFloat(),
@@ -1064,7 +1080,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                         val v_y = actor.velocity.y
                         if (actor.attachChildren.isNotEmpty() || v_x * v_x + v_y * v_y > 40) {
                             spriteBatch.draw(
-                                    bike3x,
+                                    bike3xo,
                                     sx + 2, windowHeight - sy - 2, 4.toFloat() / 2, 4.toFloat() / 2,
                                     4.toFloat(), 4.toFloat(), iconScale / 2, iconScale / 2,
                                     dir * -1, 0, 0, 64, 64, true, false
@@ -1093,7 +1109,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                         val v_y = actor.velocity.y
                         if (actor.attachChildren.isNotEmpty() || v_x * v_x + v_y * v_y > 40) {
                             spriteBatch.draw(
-                                    vehicle,
+                                    vehicleo,
                                     sx + 2, windowHeight - sy - 2,
                                     2.toFloat() / 2, 2.toFloat() / 2,
                                     2.toFloat(), 2.toFloat(),
@@ -1124,7 +1140,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                         val v_y = actor.velocity.y
                         if (actor.attachChildren.isNotEmpty() || v_x * v_x + v_y * v_y > 40) {
                             spriteBatch.draw(
-                                    pickup,
+                                    pickupo,
                                     sx + 2, windowHeight - sy - 2,
                                     2.toFloat() / 2, 2.toFloat() / 2,
                                     2.toFloat(), 2.toFloat(),
@@ -1154,7 +1170,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                         val v_y = actor.velocity.y
                         if (actor.attachChildren.isNotEmpty() || v_x * v_x + v_y * v_y > 40) {
                             spriteBatch.draw(
-                                    van,
+                                    vano,
                                     sx + 2, windowHeight - sy - 2,
                                     2.toFloat() / 2, 2.toFloat() / 2,
                                     2.toFloat(), 2.toFloat(),
@@ -1326,6 +1342,9 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                         "$weapon", sx + 20, windowHeight - sy + 20)
         }
     }
+
+
+
 
     private var lastPlayTime = System.currentTimeMillis()
     private fun safeZoneHint() {
