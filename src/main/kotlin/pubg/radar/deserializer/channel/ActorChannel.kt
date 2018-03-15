@@ -12,8 +12,8 @@ import pubg.radar.struct.cmd.PlayerStateCMD.selfID
 import pubg.radar.util.tuple2
 import java.util.concurrent.ConcurrentHashMap
 
-class ActorChannel(ChIndex: Int, client: Boolean = true) : Channel(ChIndex, CHTYPE_ACTOR, client) {
-    companion object : GameListener {
+class ActorChannel(ChIndex: Int, client: Boolean = true): Channel(ChIndex, CHTYPE_ACTOR, client) {
+    companion object: GameListener {
         init {
             register(this)
         }
@@ -22,25 +22,25 @@ class ActorChannel(ChIndex: Int, client: Boolean = true) : Channel(ChIndex, CHTY
         val visualActors = ConcurrentHashMap<NetworkGUID, Actor>()
         val airDropLocation = ConcurrentHashMap<NetworkGUID, Vector3>()
         val droppedItemLocation = ConcurrentHashMap<NetworkGUID, tuple2<Vector2, String>>()
-        val corpseLocation = ConcurrentHashMap<NetworkGUID, Vector3>()
-        val actorHasWeapons = ConcurrentHashMap<NetworkGUID, IntArray>()
-        val weapons = ConcurrentHashMap<Int, Actor>()
+        val droppedItemToItem = ConcurrentHashMap<NetworkGUID, NetworkGUID>()
         val droppedItemGroup = ConcurrentHashMap<NetworkGUID, ArrayList<NetworkGUID>>()
         val droppedItemCompToItem = ConcurrentHashMap<NetworkGUID, NetworkGUID>()
-        val droppedItemToItem = ConcurrentHashMap<NetworkGUID, NetworkGUID>()
-
+        val corpseLocation = ConcurrentHashMap<NetworkGUID, Vector3>()
+        val actorHasWeapons=ConcurrentHashMap<NetworkGUID,IntArray>()
+        val weapons = ConcurrentHashMap<Int, Actor>()
 
         override fun onGameOver() {
             actors.clear()
             visualActors.clear()
             airDropLocation.clear()
             droppedItemLocation.clear()
+            droppedItemGroup.clear()
+            droppedItemCompToItem.clear()
             droppedItemToItem.clear()
             corpseLocation.clear()
             weapons.clear()
             actorHasWeapons.clear()
-            droppedItemGroup.clear()
-            droppedItemCompToItem.clear()}
+        }
     }
 
     var actor: Actor? = null
@@ -70,8 +70,8 @@ class ActorChannel(ChIndex: Int, client: Boolean = true) : Channel(ChIndex, CHTY
             if (actor == null) return
         }
         val actor = actor!!
-            if (actor.Type == DroppedItem && bunch.bitsLeft() == 0)
-                 droppedItemLocation.remove(droppedItemToItem[actor.netGUID] ?: return)
+        if (actor.Type == DroppedItem && bunch.bitsLeft() == 0)
+            droppedItemLocation.remove(droppedItemToItem[actor.netGUID] ?: return)
 
         while (bunch.notEnd()) {
             //header
@@ -128,11 +128,10 @@ class ActorChannel(ChIndex: Int, client: Boolean = true) : Channel(ChIndex, CHTY
                         repObj = NetGuidCacheObject("DroppedItemGroupRootComponent", repObj.outerGUID)
                     repl_layout_bunch(outPayload, repObj, actor)
                 }
-
                 if (!client && repObj?.pathName == "Player") {
                     selfID = actor.netGUID
                     while (outPayload.notEnd())
-                    charmovecomp(outPayload)
+                        charmovecomp(outPayload)
                     VehicleSyncComponent(outPayload)
                 }
 
