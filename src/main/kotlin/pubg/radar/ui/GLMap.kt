@@ -179,9 +179,9 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
     private lateinit var hpgreen: BitmapFont
 
 
-    private val tileZooms = listOf("256", "512", "1024", "2048", "4096"/*, "8192"*/)
-    private val tileRowCounts = listOf(1, 2, 4, 8, 16/*, 32*/)
-    private val tileSizes = listOf(819200f, 409600f, 204800f, 102400f, 51200f/*, 25600f*/)
+    private val tileZooms = listOf("256", "512", "1024", "2048", "4096", "8192")
+    private val tileRowCounts = listOf(1, 2, 4, 8, 16, 32)
+    private val tileSizes = listOf(819200f, 409600f, 204800f, 102400f, 51200f, 25600f)
 
     private val layout = GlyphLayout()
     private var windowWidth = initialWindowWidth
@@ -488,6 +488,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         val cameraTileScale = Math.max(windowWidth, windowHeight) / camera.zoom
         val useScale: Int
         useScale = when {
+            cameraTileScale > 8192 -> 5
             cameraTileScale > 4096 -> 4
             cameraTileScale > 2048 -> 3
             cameraTileScale > 1024 -> 2

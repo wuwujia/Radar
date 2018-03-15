@@ -36,7 +36,7 @@ fun charmovecomp(bunch: Bunch) {
                 val view = rpcPayload.readUInt32()
                 selfDirection = (view shr 16) * shortRotationScale
 
-        print("view:$view")
+           //   print("view:$view")
             }
       if (rpcPayload.readBit()) {
         val clientMovementBase = rpcPayload.readObject()
@@ -64,7 +64,8 @@ fun charmovecomp(bunch: Bunch) {
             }
             if (rpcPayload.readBit()) {
                 val view = rpcPayload.readUInt32()
-//        print("view:$view")
+
+     //   print("view:$view")
             }
 
             if (rpcPayload.readBit()) {
@@ -77,7 +78,7 @@ fun charmovecomp(bunch: Bunch) {
             if (rpcPayload.readBit()) {
                 val clientLoc = rpcPayload.readVector(100, 30)
                 selfCoords.set(clientLoc.x, clientLoc.y)
-//        print("clientLoc:(${clientLoc.x},${clientLoc.y}),")
+        print("clientLoc:(${clientLoc.x},${clientLoc.y}),")
             }
             if (rpcPayload.readBit()) {
                 val compressedMoveFlags = rpcPayload.readUInt8()
@@ -98,16 +99,16 @@ fun charmovecomp(bunch: Bunch) {
       }
       if (rpcPayload.readBit()) {
        val inAccel = rpcPayload.readVector(10, 24)
-       print("inAccel:(${inAccel.x},${inAccel.y}),")
+     //  print("inAccel:(${inAccel.x},${inAccel.y}),")
       }
       if (rpcPayload.readBit()) {
         val compressedMoveFlags = rpcPayload.readUInt8()
-       print("compressedMoveFlags:$compressedMoveFlags,")
+    //   print("compressedMoveFlags:$compressedMoveFlags,")
       }
       check(rpcPayload.bitsLeft()==0)
     }
         else -> {
-//      println()
+    //  println()
         }
     }
 }
