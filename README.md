@@ -5,7 +5,7 @@
 
 #Beware this is a ROUGH update, it is RIDDLED with bugs, but it semi works.
 
-join us on [Discord for updates](https://discord.gg/pAuVxYB)
+join us on [Discord for updates](https://discord.me/radarproject)
 
 
 'Reverted' Back to an older Commit Due to CharMoveComp No longer being used.
