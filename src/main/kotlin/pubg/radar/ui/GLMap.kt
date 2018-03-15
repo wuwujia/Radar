@@ -851,6 +851,18 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
         }
 
 
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        draw(Line) {
+            airDropLocation.values.forEach {
+                val (x, y) = it
+                val airdropcoords = (Vector2(x, y))
+                color = GREEN
+                line(selfCoords, airdropcoords)
+            }
+            Gdx.gl.glDisable(GL20.GL_BLEND)
+        }
+
+
         val zoom = camera.zoom
         Gdx.gl.glEnable(GL20.GL_BLEND)
         draw(Filled) {

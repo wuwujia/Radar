@@ -137,9 +137,8 @@ class Sniffer {
                         val raw = udp.payload.rawData
                         if (raw.size == 44)
                             parseSelfLocation(raw)
-                        else if (udp.header.srcPort.valueAsInt() in 100..7999)
+                        else if (udp.header.srcPort.valueAsInt() in 7000..7999)
                             proc_raw_packet(raw)
-
                     } catch (e: Exception) {
                     }
                 }
