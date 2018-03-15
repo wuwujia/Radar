@@ -40,6 +40,7 @@ object PlayerStateCMD : GameListener {
     var selfID = NetworkGUID(0)
     var selfStateID = NetworkGUID(0)
 
+
     fun process(actor: Actor, bunch: Bunch, repObj: NetGuidCacheObject?, waitingHandle: Int, data: HashMap<String, Any?>): Boolean {
         with(bunch) {
             when (waitingHandle) {
@@ -80,8 +81,11 @@ object PlayerStateCMD : GameListener {
                     //   println("${actor.netGUID} playerID=$name")
                 }
                 19 -> {
-                    val playerID = propertyInt()
+              //      val playerID = propertyInt()
 //          println("${actor.netGUID} playerID=$playerID")
+                    val teamNumber = readInt(100)
+                    teamNumbers[actor.netGUID] = teamNumber
+                    //println(teamNumbers)
                 }
                 20 -> {
                     val bFromPreviousLevel = propertyBool()
@@ -108,8 +112,8 @@ object PlayerStateCMD : GameListener {
 //          println("${actor.netGUID} StartTime=$StartTime")
                 }
                 26 -> {
-                    val uniqueId = propertyNetId()
-                    uniqueIds[uniqueId] = actor.netGUID
+          //          val uniqueId = propertyNetId()
+            //        uniqueIds[uniqueId] = actor.netGUID
 //          println("${playerNames[actor.netGUID]}${actor.netGUID} uniqueId=$uniqueId")
                 }
                 27 -> {//indicate player's death
@@ -130,8 +134,8 @@ object PlayerStateCMD : GameListener {
                     val ObserverAuthorityType = readInt(4)
                 }
                 32 -> {
-                    val teamNumber = readInt(100)
-                    teamNumbers[actor.netGUID] = teamNumber
+                 //   val teamNumber = readInt(100)
+                 //   teamNumbers[actor.netGUID] = teamNumber
                 }
                 33 -> {
                     val bIsZombie = propertyBool()
@@ -155,7 +159,9 @@ object PlayerStateCMD : GameListener {
                 39 -> {
                     val TotalMovedDistanceMeter = propertyFloat()
                     selfStateID = actor.netGUID//only self will get this update
-//          selfID = actor.netGUID//only self will get this update
+
+                  //  println("SelfID: $selfStateID ")
+        //  selfID = actor.netGUID//only self will get this update
                 }
                 40 -> {
                     val TotalGivenDamages = propertyFloat()
@@ -179,7 +185,8 @@ object PlayerStateCMD : GameListener {
                     val currentAttackerPlayerNetId = propertyString()
                     attacks.add(Pair(uniqueIds[currentAttackerPlayerNetId]!!, actor.netGUID))
                 }
-                else -> return false
+                else ->
+                    return false
             }
         }
         return true

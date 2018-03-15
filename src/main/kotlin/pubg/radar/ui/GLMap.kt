@@ -64,6 +64,7 @@ import pubg.radar.struct.cmd.PlayerStateCMD.attacks
 import pubg.radar.struct.cmd.PlayerStateCMD.playerNames
 import pubg.radar.struct.cmd.PlayerStateCMD.playerNumKills
 import pubg.radar.struct.cmd.PlayerStateCMD.selfID
+import pubg.radar.struct.cmd.PlayerStateCMD.teamNumbers
 import pubg.radar.util.PlayerProfile.Companion.query
 import pubg.radar.util.tuple4
 import wumo.pubg.struct.cmd.TeamCMD.team
@@ -1339,7 +1340,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
             val (sx, sy) = mapToWindow(x, y)
             val playerStateGUID = actorWithPlayerState[actor.netGUID] ?: return@forEach
             val name = playerNames[playerStateGUID] ?: return@forEach
-            //   val teamNumber = teamNumbers[playerStateGUID] ?: 0
+            val teamNumber = teamNumbers[playerStateGUID] ?: 0
             val numKills = playerNumKills[playerStateGUID] ?: 0
             val health = actorHealth[actor.netGUID] ?: 100f
             val equippedWeapons = actorHasWeapons[actor.netGUID]
@@ -1366,6 +1367,7 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
                     }
                     nameFont.draw(spriteBatch, "|N: $name\n|D: ${distance}m\n" +
                             "|H:\n" +
+                            "|T: $teamNumber\n" +
                             "|W: $weapon",
                             sx + 20, windowHeight - sy + 20)
 
