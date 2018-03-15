@@ -303,8 +303,8 @@ class GLMap : InputAdapter(), ApplicationListener, GameListener {
             }
 
         // Zoom In/Out || Overrides Max/Min Zoom
-            F9 -> camera.zoom = camera.zoom + 0.00525f
-            F10 -> camera.zoom = camera.zoom - 0.00525f
+            PLUS -> camera.zoom = camera.zoom + 0.00525f
+            MINUS -> camera.zoom = camera.zoom - 0.00525f
 
         // Toggle View Line
             F11 -> toggleView = toggleView * -1
