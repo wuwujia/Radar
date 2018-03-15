@@ -128,13 +128,14 @@ class ActorChannel(ChIndex: Int, client: Boolean = true) : Channel(ChIndex, CHTY
                         repObj = NetGuidCacheObject("DroppedItemGroupRootComponent", repObj.outerGUID)
                     repl_layout_bunch(outPayload, repObj, actor)
                 }
-                if (client && repObj?.pathName == "Player") {
-                  //  println("made it into CharMoveCOmp.")
+
+                if (!client && repObj?.pathName == "Player") {
                     selfID = actor.netGUID
                     while (outPayload.notEnd())
-                        charmovecomp(outPayload)
-                       // VehicleSyncComponent(outPayload)
+                    charmovecomp(outPayload)
+                    VehicleSyncComponent(outPayload)
                 }
+
             } catch (e: Exception) {
             }
             bunch.skipBits(NumPayloadBits)

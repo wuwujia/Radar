@@ -16,25 +16,23 @@ fun VehicleSyncComponent(bunch: Bunch) {
             if (rpcPayload.readBit()) { // clientLoc : VectorNetQuantize100?,
                 val clientLoc = rpcPayload.readVector(100, 30)
                 println("Client Loc: $clientLoc")
-               // selfCoords.set(clientLoc.x, clientLoc.y)
+                // selfCoords.set(clientLoc.x, clientLoc.y)
             }
             if (rpcPayload.readBit()) { //clientLinearVelocity : VectorNetQuantize100?,
                 val cLinVelocity = rpcPayload.readVector(100, 30)
                 println("clientLinearVelocity: $cLinVelocity")
             }
             if (rpcPayload.readBit()) { //clientRotator : VectorNetQuantizeNormal?,
-                 val clientRotator = rpcPayload.readVector()
+                val clientRotator = rpcPayload.readVector(10, 24)
                 println("clientRotator: $clientRotator")
             }
             if (rpcPayload.readBit()) { // clientAngularVelocity : VectorNetQuantize100?
                 val cAngVelocity = rpcPayload.readVector(100, 30)
                 println("clientAngularVelocity: $cAngVelocity")
             } else {
-           //     println()
+                //     println()
                 //check(rpcPayload.bitsLeft()==0)
             }
-
-
         }
     }
 }

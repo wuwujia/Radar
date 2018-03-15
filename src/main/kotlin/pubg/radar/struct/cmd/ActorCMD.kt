@@ -1,6 +1,7 @@
 package pubg.radar.struct.cmd
 
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
 import pubg.radar.GameListener
 import pubg.radar.bugln
 import pubg.radar.deserializer.ROLE_MAX
@@ -32,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 var selfDirection = 0f
 val selfCoords = Vector2()
+val clientLoc = Vector3()
 var selfAttachTo: Actor? = null
 
 
