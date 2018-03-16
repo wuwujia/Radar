@@ -7,35 +7,42 @@ import java.util.concurrent.ConcurrentHashMap
 
 enum class Archetype { //order matters, it affects the order of drawing
     GameState,
-    Plane,
-    Parachute,
+    PlayerState,
     Player,
+    Team,
+    Parachute,
+    Plane,
     DroopedItemGroup,
-    Grenade,
+    WeaponProcessor,
+    Weapon,
     TwoSeatBoat,
+    SixSeatBoat,
     FourSeatDU,
     FourSeatP,
-    SixSeatBoat,
     TwoSeatBike,
     TwoSeatCar,
     ThreeSeatCar,
     SixSeatCar,
     AirDrop,
-    PlayerState,
-    Team,
     DeathDropItemPackage,
     DroppedItem,
-    WeaponProcessor,
-    Weapon,
+    Grenade,
     Other;
+
 
     companion object {
         fun fromArchetype(archetype: String): Archetype = when {
             archetype.contains("Default__TSLGameState") -> GameState
+            archetype.contains("Default__Player") -> Player
+            archetype.contains("Default__TslPlayerState") -> PlayerState
+            archetype.contains("Default__Team", true) -> Team
+            archetype.contains("Default__WeaponProcessor") -> WeaponProcessor
             archetype.contains("Aircraft") -> Plane
             archetype.contains("Parachute") -> Parachute
-            archetype.contains("Default__Player") -> Player
             archetype.contains("DroppedItemGroup") -> DroopedItemGroup
+            archetype.contains("Weap") -> Weapon
+            archetype.contains("AquaRail", true) -> TwoSeatBoat
+            archetype.contains("boat", true) -> SixSeatBoat
             archetype.contains("bike", true) -> TwoSeatBike
             archetype.contains("Sidecart", true) -> ThreeSeatCar
             archetype.contains("buggy", true) -> TwoSeatCar
@@ -44,16 +51,10 @@ enum class Archetype { //order matters, it affects the order of drawing
             archetype.contains("pickup", true) -> FourSeatP
             archetype.contains("bus", true) -> SixSeatCar
             archetype.contains("van", true) -> SixSeatCar
-            archetype.contains("AquaRail", true) -> TwoSeatBoat
-            archetype.contains("boat", true) -> SixSeatBoat
             archetype.contains("Carapackage", true) -> AirDrop
-            archetype.contains(Regex("(SmokeBomb|Molotov|Grenade|FlashBang|BigBomb)", RegexOption.IGNORE_CASE)) -> Grenade
-            archetype.contains("Default__TslPlayerState") -> PlayerState
-            archetype.contains("Default__Team", true) -> Team
             archetype.contains("DeathDropItemPackage", true) -> DeathDropItemPackage
             archetype.contains("DroppedItem") -> DroppedItem
-            archetype.contains("Default__WeaponProcessor") -> WeaponProcessor
-            archetype.contains("Weap") -> Weapon
+            archetype.contains(Regex("(SmokeBomb|Molotov|Grenade|FlashBang|BigBomb)", RegexOption.IGNORE_CASE)) -> Grenade
             else -> Other
         }
     }
